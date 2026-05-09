@@ -147,19 +147,22 @@ export default function SelfieStepPage() {
       <div className="grid gap-4">
         <Card>
           <ProgressDots total={4} activeIndex={2} />
-          <div className="mt-4 text-2xl font-extrabold tracking-tight">
+          <div
+            className="mt-4 text-2xl font-extrabold tracking-tight text-[var(--foreground)]"
+            style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+          >
             Take a quick selfie
           </div>
-          <p className="mt-2 text-lg text-zinc-700 dark:text-zinc-200">
+          <p className="mt-2 text-base text-[var(--foreground-muted)] leading-relaxed">
             Your camera opens on its own on most laptops and phones. When you’re ready,
             tap <span className="font-semibold">Use this photo</span>. You can also upload
             a picture instead.
           </p>
 
           <div className="mt-5 grid gap-4 lg:grid-cols-2 lg:items-start">
-            <div className="rounded-3xl bg-zinc-50 p-4 ring-1 ring-zinc-200 dark:bg-zinc-950 dark:ring-zinc-800">
-              <div className="text-lg font-semibold">Camera</div>
-              <div className="mt-3 overflow-hidden rounded-2xl bg-black ring-1 ring-zinc-800">
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--border-subtle)] p-4">
+              <div className="text-base font-semibold text-[var(--foreground)]">Camera</div>
+              <div className="mt-3 overflow-hidden rounded-xl bg-black">
                 <video
                   ref={videoRef}
                   className="aspect-[4/3] w-full object-cover"
@@ -178,7 +181,7 @@ export default function SelfieStepPage() {
                 </PrimaryButton>
               </div>
 
-              <label className="mt-6 block text-lg font-semibold" htmlFor="selfie">
+              <label className="mt-6 block text-base font-semibold text-[var(--foreground)]" htmlFor="selfie">
                 Or upload a photo
               </label>
               <input
@@ -191,12 +194,12 @@ export default function SelfieStepPage() {
               />
 
               <div className="mt-6">
-                <label className="block text-lg font-semibold" htmlFor="custom">
+                <label className="block text-base font-semibold text-[var(--foreground)]" htmlFor="custom">
                   Avatar style (optional)
                 </label>
                 <textarea
                   id="custom"
-                  className="mt-2 w-full resize-y rounded-2xl bg-white p-4 text-lg ring-1 ring-zinc-200 focus:outline-none focus:ring-4 focus:ring-[var(--accent-ring)] dark:bg-zinc-900 dark:ring-zinc-800"
+                  className="mt-2 w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 text-base text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] focus:border-[var(--accent)] transition-colors"
                   rows={3}
                   value={customization}
                   onChange={(e) => setCustomization(e.target.value)}
@@ -221,14 +224,14 @@ export default function SelfieStepPage() {
               ) : null}
             </div>
 
-            <div className="rounded-3xl bg-zinc-50 p-4 ring-1 ring-zinc-200 dark:bg-zinc-950 dark:ring-zinc-800">
-              <div className="text-lg font-semibold">Preview</div>
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--border-subtle)] p-4">
+              <div className="text-base font-semibold text-[var(--foreground)]">Preview</div>
               {avatarDataUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   alt="Your generated avatar"
                   src={avatarDataUrl}
-                  className="mt-3 aspect-square w-full rounded-3xl object-cover ring-1 ring-zinc-200 dark:ring-zinc-800"
+                  className="mt-3 aspect-square w-full rounded-2xl object-cover border border-[var(--border)]"
                 />
               ) : selfieDataUrl ? (
                 <div className="mt-3 grid gap-3">
@@ -236,14 +239,14 @@ export default function SelfieStepPage() {
                   <img
                     alt="Photo you chose"
                     src={selfieDataUrl}
-                    className="aspect-square w-full rounded-3xl object-cover ring-1 ring-zinc-200 dark:ring-zinc-800"
+                    className="aspect-square w-full rounded-2xl object-cover border border-[var(--border)]"
                   />
-                  <div className="text-base font-semibold text-zinc-600 dark:text-zinc-300">
+                  <div className="text-sm font-semibold text-[var(--foreground-muted)]">
                     When it looks good, tap “Create cute avatar”.
                   </div>
                 </div>
               ) : (
-                <div className="mt-3 grid aspect-square place-items-center rounded-3xl bg-white text-lg font-semibold text-zinc-500 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:ring-zinc-800">
+                <div className="mt-3 grid aspect-square place-items-center rounded-2xl bg-[var(--surface)] text-base font-semibold text-[var(--foreground-muted)] border border-[var(--border)]">
                   No photo yet
                 </div>
               )}
@@ -255,7 +258,7 @@ export default function SelfieStepPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Link
               href="/onboarding/voice/2"
-              className="text-lg font-semibold text-zinc-600 underline-offset-4 hover:underline dark:text-zinc-300"
+              className="text-base font-semibold text-[var(--foreground-muted)] underline-offset-4 hover:underline hover:text-[var(--accent)]"
             >
               Back
             </Link>

@@ -30,10 +30,13 @@ export default function LanguagePage() {
       <div className="grid gap-4">
         <Card className="p-6">
           <ProgressDots total={4} activeIndex={0} />
-          <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight">
+          <h2
+            className="mt-6 text-center text-3xl font-extrabold tracking-tight text-[var(--foreground)]"
+            style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+          >
             Silver Sparks
           </h2>
-          <p className="mt-4 text-center text-lg text-zinc-600 dark:text-zinc-300">
+          <p className="mt-4 text-center text-base text-[var(--foreground-muted)] leading-relaxed">
             A calm, step-by-step sign-up for adults 55+. You can use your voice for most
             questions. Which language feels most comfortable?
           </p>
@@ -44,9 +47,14 @@ export default function LanguagePage() {
                 key={lang.code}
                 type="button"
                 onClick={() => selectLanguage(lang.code)}
-                className="w-full rounded-2xl text-left ring-1 ring-zinc-200 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--accent-ring)] dark:ring-zinc-800 dark:hover:bg-zinc-900"
+                className="w-full rounded-xl text-left border border-[var(--border)] bg-[var(--surface)] transition-all duration-150 hover:border-[var(--accent)] hover:bg-orange-50 dark:hover:bg-orange-950/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-ring)]"
               >
-                <span className="block p-5 text-xl font-semibold">{lang.name}</span>
+                <span
+                  className="block px-5 py-4 text-base font-semibold text-[var(--foreground)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+                >
+                  {lang.name}
+                </span>
               </button>
             ))}
           </div>

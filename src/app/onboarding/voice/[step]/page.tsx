@@ -179,10 +179,13 @@ function VoiceStepPanel({
       <div className="grid gap-4">
         <Card>
           <ProgressDots total={4} activeIndex={1} />
-          <div className="mt-4 text-base font-semibold text-zinc-500 dark:text-zinc-400">
+          <div className="mt-4 text-base font-semibold text-[var(--foreground-muted)]">
             Question {step} of {prompts.length}
           </div>
-          <div className="mt-2 text-3xl font-extrabold leading-snug tracking-tight">
+          <div
+            className="mt-2 text-3xl font-extrabold leading-snug tracking-tight text-[var(--foreground)]"
+            style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+          >
             {prompt.text}
           </div>
           <div className="mt-4 flex flex-wrap gap-3">
@@ -219,9 +222,9 @@ function VoiceStepPanel({
         </Card>
 
         <Card>
-          <div className="text-lg font-semibold">Transcript (edit if needed)</div>
+          <div className="text-base font-semibold text-[var(--foreground)]">Transcript (edit if needed)</div>
           <textarea
-            className="mt-3 w-full resize-y rounded-2xl bg-zinc-50 p-4 text-xl font-semibold ring-1 ring-zinc-200 focus:outline-none focus:ring-4 focus:ring-[var(--accent-ring)] dark:bg-zinc-950 dark:ring-zinc-800"
+            className="mt-3 w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 text-base font-semibold text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] focus:border-[var(--accent)] transition-colors"
             rows={5}
             value={draft}
             onChange={(e) => {
@@ -231,7 +234,7 @@ function VoiceStepPanel({
             placeholder="Your words will appear here after you finish speaking."
           />
           {autoAdvanceIn !== null ? (
-            <div className="mt-2 text-base font-semibold text-zinc-600 dark:text-zinc-300">
+            <div className="mt-2 text-sm font-semibold text-[var(--foreground-muted)]">
               Next question in <span className="font-mono">{autoAdvanceIn}</span>…
             </div>
           ) : null}
@@ -243,7 +246,7 @@ function VoiceStepPanel({
               href={
                 step === 1 ? "/onboarding/language" : `/onboarding/voice/${step - 1}`
               }
-              className="text-lg font-semibold text-zinc-600 underline-offset-4 hover:underline dark:text-zinc-300"
+              className="text-base font-semibold text-[var(--foreground-muted)] underline-offset-4 hover:underline hover:text-[var(--accent)]"
             >
               Back
             </Link>

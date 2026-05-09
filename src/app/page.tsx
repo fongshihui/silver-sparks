@@ -4,18 +4,28 @@ import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/ui/Card";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { useTtsPlayer } from "@/hooks/useTtsPlayer";
+import { isAuthenticated } from "@/lib/auth";
 import { isOnboarded, loadProfile, mergeProfile } from "@/lib/localProfile";
 import { rankMatches, type RankedMatch } from "@/lib/matchRanking";
 import { sampleMatches } from "@/lib/sampleData";
 import { SwipeableMatchCard } from "@/components/ui/SwipeableMatchCard";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 export default function Home() {
+  const router = useRouter();
   const [profile] = useState(() => loadProfile());
+  const [authed] = useState(() => isAuthenticated());
   const onboarded = isOnboarded(profile);
   const lang = profile?.language ?? "en";
   const { play } = useTtsPlayer(lang);
+
+  useEffect(() => {
+    if (authed && !onboarded) {
+      router.replace(profile?.language ? "/onboarding/voice/1" : "/onboarding/language");
+    }
+  }, [authed, onboarded, profile?.language, router]);
 
   const [deck, setDeck] = useState<RankedMatch[]>(() =>
     rankMatches(sampleMatches, loadProfile()),
@@ -44,44 +54,48 @@ export default function Home() {
       subtitle={
         onboarded
           ? "Swipe right on people you’d like to talk to. Closest matches first."
-          : "Friendship and romance for your golden years — large text, gentle steps, and safety built in."
+          : "Friendship and romance for your golden years"
       }
     >
       <div className="grid gap-4">
         {!onboarded ? (
           <Card className="flex flex-col items-center justify-center gap-8 py-14 text-center">
             <div className="flex max-w-lg flex-col gap-3">
-              <h2 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
-                Welcome
+              <h2
+                className="text-3xl font-extrabold tracking-tight text-[var(--foreground)]"
+                style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+              >
+                Welcome to Silver Sparks
               </h2>
-              <p className="text-lg text-zinc-600 dark:text-zinc-300">
-                First, choose the language you want for voice prompts and read-aloud.
-                We’ll walk you through a few short questions, a photo for a cute avatar,
-                and your profile before you see anyone.
+              <p className="text-base text-[var(--foreground-muted)] leading-relaxed">
+                Friendship and romance for your golden years. Choose your language and we'll walk you through a
+                short setup.
               </p>
             </div>
-            <div className="flex w-full max-w-sm flex-col gap-4">
-              <Link href="/onboarding/language" className="w-full">
+            <div className="flex w-full max-w-sm flex-col gap-3">
+              <Link href="/signup" className="w-full">
                 <PrimaryButton size="xl" className="w-full">
-                  Choose language & sign up
+                  Sign up with email
                 </PrimaryButton>
               </Link>
-              <button
-                type="button"
-                onClick={() =>
-                  alert("Log in is not wired in this demo — use Sign up on this device.")
-                }
-                className="w-full rounded-2xl bg-zinc-100 py-4 text-lg font-semibold text-zinc-800 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+              <Link
+                href="/login"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] py-3 text-center text-base font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
               >
-                Log in (demo)
-              </button>
+                Log in
+              </Link>
             </div>
           </Card>
         ) : (
           <>
             <Card>
-              <div className="text-lg font-semibold">Safety reminder</div>
-              <p className="mt-2 text-lg text-zinc-700 dark:text-zinc-200">{reminder}</p>
+              <div
+                className="text-base font-bold text-[var(--foreground)]"
+                style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+              >
+                Safety reminder
+              </div>
+              <p className="mt-2 text-sm text-[var(--foreground-muted)] leading-relaxed">{reminder}</p>
               <PrimaryButton
                 type="button"
                 variant="secondary"
@@ -107,10 +121,15 @@ export default function Home() {
               </div>
             ) : (
               <Card className="py-10 text-center">
-                <h2 className="mb-2 text-2xl font-bold">No more people in your radius</h2>
-                <p className="text-lg text-zinc-600 dark:text-zinc-300">
+                <h2
+                  className="mb-2 text-2xl font-bold text-[var(--foreground)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+                >
+                  No more people in your radius
+                </h2>
+                <p className="text-base text-[var(--foreground-muted)]">
                   Try widening age or distance in{" "}
-                  <Link href="/profile" className="font-semibold underline underline-offset-4">
+                  <Link href="/profile" className="font-semibold text-[var(--accent)] underline underline-offset-4">
                     My profile
                   </Link>
                   , or check back later.

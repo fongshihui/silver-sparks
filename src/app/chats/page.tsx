@@ -28,17 +28,17 @@ export default function ChatsPage() {
     >
       <div className="grid gap-4">
         {!onboarded ? (
-          <Card className="text-center text-lg text-zinc-700 dark:text-zinc-200">
-            <Link href="/onboarding/language" className="font-semibold underline underline-offset-4">
+          <Card className="text-center text-base text-[var(--foreground-muted)]">
+            <Link href="/onboarding/language" className="font-semibold text-[var(--accent)] underline underline-offset-4">
               Complete setup
             </Link>{" "}
             to use messages.
           </Card>
         ) : threads.length === 0 ? (
           <Card className="text-center">
-            <p className="text-lg text-zinc-700 dark:text-zinc-200">
+            <p className="text-base text-[var(--foreground-muted)]">
               No conversations yet. On{" "}
-              <Link href="/" className="font-semibold underline underline-offset-4">
+              <Link href="/" className="font-semibold text-[var(--accent)] underline underline-offset-4">
                 Matches
               </Link>
               , swipe right on someone you’d like to talk to.
@@ -50,11 +50,14 @@ export default function ChatsPage() {
               <li key={m.id}>
                 <Card className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <div className="text-xl font-extrabold">
+                    <div
+                      className="text-xl font-extrabold text-[var(--foreground)]"
+                      style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+                    >
                       {m.name}{" "}
-                      <span className="text-lg font-semibold text-zinc-500">· {m.age}</span>
+                      <span className="text-base font-semibold text-[var(--foreground-muted)]">· {m.age}</span>
                     </div>
-                    <div className="mt-1 text-base text-zinc-600 dark:text-zinc-300">
+                    <div className="mt-1 text-sm text-[var(--foreground-muted)]">
                       {m.city}
                     </div>
                   </div>

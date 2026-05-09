@@ -165,10 +165,13 @@ export default function ProfileStepPage() {
       <div className="grid gap-4">
         <Card>
           <ProgressDots total={4} activeIndex={3} />
-          <div className="mt-4 text-2xl font-extrabold tracking-tight">
+          <div
+            className="mt-4 text-2xl font-extrabold tracking-tight text-[var(--foreground)]"
+            style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+          >
             Check your details
           </div>
-          <p className="mt-2 text-lg text-zinc-700 dark:text-zinc-200">
+          <p className="mt-2 text-base text-[var(--foreground-muted)] leading-relaxed">
             We started this from your voice answers and avatar. Change anything you
             like before you continue.
           </p>
@@ -191,12 +194,12 @@ export default function ProfileStepPage() {
               ) : null}
             </div>
             <div>
-              <label className="block text-lg font-semibold" htmlFor="name">
+              <label className="block text-base font-semibold text-[var(--foreground)]" htmlFor="name">
                 Name
               </label>
               <input
                 id="name"
-                className="mt-2 w-full rounded-2xl bg-zinc-50 px-4 py-4 text-lg ring-1 ring-zinc-200 focus:outline-none focus:ring-4 focus:ring-[var(--accent-ring)] dark:bg-zinc-950 dark:ring-zinc-800"
+                className="mt-2 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-base text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] focus:border-[var(--accent)] transition-colors"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onBlur={saveDraft}
@@ -205,13 +208,13 @@ export default function ProfileStepPage() {
             </div>
 
             <div>
-              <label className="block text-lg font-semibold" htmlFor="age">
+              <label className="block text-base font-semibold text-[var(--foreground)]" htmlFor="age">
                 Age
               </label>
               <input
                 id="age"
                 inputMode="numeric"
-                className="mt-2 w-full rounded-2xl bg-zinc-50 px-4 py-4 text-lg ring-1 ring-zinc-200 focus:outline-none focus:ring-4 focus:ring-[var(--accent-ring)] dark:bg-zinc-950 dark:ring-zinc-800"
+                className="mt-2 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-base text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] focus:border-[var(--accent)] transition-colors"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
                 onBlur={saveDraft}
@@ -225,24 +228,24 @@ export default function ProfileStepPage() {
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-lg font-semibold" htmlFor="city">
+              <label className="block text-base font-semibold text-[var(--foreground)]" htmlFor="city">
                 City or area
               </label>
               <input
                 id="city"
-                className="mt-2 w-full rounded-2xl bg-zinc-50 px-4 py-4 text-lg ring-1 ring-zinc-200 focus:outline-none focus:ring-4 focus:ring-[var(--accent-ring)] dark:bg-zinc-950 dark:ring-zinc-800"
+                className="mt-2 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-base text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] focus:border-[var(--accent)] transition-colors"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 onBlur={() => void syncMapToCity()}
                 placeholder="e.g. Singapore"
               />
               {isGeocodingCity ? (
-                <div className="mt-2 text-sm font-semibold text-zinc-600 dark:text-zinc-300">
+                <div className="mt-2 text-sm font-semibold text-[var(--foreground-muted)]">
                   Updating map from city...
                 </div>
               ) : null}
               {cityGeoHint ? (
-                <div className="mt-2 text-sm font-semibold text-zinc-600 dark:text-zinc-300">
+                <div className="mt-2 text-sm font-semibold text-[var(--foreground-muted)]">
                   {cityGeoHint}
                 </div>
               ) : null}
@@ -250,7 +253,7 @@ export default function ProfileStepPage() {
 
             <div className="sm:col-span-2">
               <div className="text-lg font-semibold">Location on map</div>
-              <p className="mt-1 text-base text-zinc-600 dark:text-zinc-300">
+              <p className="mt-1 text-sm text-[var(--foreground-muted)]">
                 Helps sort people by distance. Drag the pin if the default spot is
                 wrong.
               </p>
@@ -265,12 +268,12 @@ export default function ProfileStepPage() {
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-lg font-semibold" htmlFor="bio">
+              <label className="block text-base font-semibold text-[var(--foreground)]" htmlFor="bio">
                 About you
               </label>
               <textarea
                 id="bio"
-                className="mt-2 w-full resize-y rounded-2xl bg-zinc-50 p-4 text-lg ring-1 ring-zinc-200 focus:outline-none focus:ring-4 focus:ring-[var(--accent-ring)] dark:bg-zinc-950 dark:ring-zinc-800 disabled:opacity-50"
+                className="mt-2 w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 text-base text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] focus:border-[var(--accent)] transition-colors disabled:opacity-50"
                 rows={4}
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
@@ -281,9 +284,12 @@ export default function ProfileStepPage() {
             </div>
           </div>
 
-          <div className="mt-8 border-t border-zinc-200 pt-6 dark:border-zinc-800">
-            <div className="text-2xl font-extrabold tracking-tight">
-              Who you’d like to meet
+          <div className="mt-8 border-t border-[var(--border)] pt-6">
+            <div
+              className="text-2xl font-extrabold tracking-tight text-[var(--foreground)]"
+              style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+            >
+              Who you'd like to meet
             </div>
 
             <div className="mt-5 grid gap-6 sm:grid-cols-2">
@@ -310,7 +316,7 @@ export default function ProfileStepPage() {
                     type="number"
                     min={18}
                     max={120}
-                    className="w-24 rounded-xl bg-zinc-50 p-3 text-center text-lg ring-1 ring-zinc-200 dark:bg-zinc-950 dark:ring-zinc-800"
+                    className="w-24 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-center text-base text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] focus:border-[var(--accent)] transition-colors"
                     value={ageRange[0]}
                     onChange={(e) =>
                       setAgeRange([Number(e.target.value), ageRange[1]])
@@ -322,7 +328,7 @@ export default function ProfileStepPage() {
                     type="number"
                     min={18}
                     max={120}
-                    className="w-24 rounded-xl bg-zinc-50 p-3 text-center text-lg ring-1 ring-zinc-200 dark:bg-zinc-950 dark:ring-zinc-800"
+                    className="w-24 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-center text-base text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] focus:border-[var(--accent)] transition-colors"
                     value={ageRange[1]}
                     onChange={(e) =>
                       setAgeRange([ageRange[0], Number(e.target.value)])
@@ -347,7 +353,7 @@ export default function ProfileStepPage() {
                           "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--accent-ring)]",
                           on
                             ? "bg-[var(--accent)] text-white ring-transparent"
-                            : "bg-zinc-100 text-zinc-800 ring-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:ring-zinc-700",
+                            : "bg-[var(--surface)] text-[var(--foreground)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]",
                         ].join(" ")}
                       >
                         {g}
@@ -359,7 +365,7 @@ export default function ProfileStepPage() {
             </div>
           </div>
 
-          <div className="mt-6 border-t border-zinc-200 pt-6 dark:border-zinc-800">
+          <div className="mt-6 border-t border-[var(--border)] pt-6">
             <div className="text-lg font-semibold">Interests (optional)</div>
             <div className="mt-3 flex flex-wrap gap-2">
               {defaultInterests.map((tag) => {
@@ -377,7 +383,7 @@ export default function ProfileStepPage() {
                       "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--accent-ring)]",
                       on
                         ? "bg-[var(--accent)] text-white ring-transparent"
-                        : "bg-zinc-100 text-zinc-800 ring-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:ring-zinc-700",
+                        : "bg-[var(--surface)] text-[var(--foreground)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)]",
                     ].join(" ")}
                   >
                     {tag}
@@ -392,7 +398,7 @@ export default function ProfileStepPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Link
               href="/onboarding/selfie"
-              className="text-lg font-semibold text-zinc-600 underline-offset-4 hover:underline dark:text-zinc-300"
+              className="text-base font-semibold text-[var(--foreground-muted)] underline-offset-4 hover:underline hover:text-[var(--accent)]"
             >
               Back
             </Link>

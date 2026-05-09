@@ -57,13 +57,13 @@ export function SwipeableMatchCard({
       transition={{ type: "spring", stiffness: 320, damping: 24 }}
       className="h-[500px] w-full cursor-grab active:cursor-grabbing"
     >
-      <Card className="relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border-2 border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+      <Card className="relative flex h-full flex-col justify-between overflow-hidden !rounded-2xl !border-[var(--border)] bg-[var(--surface)] !p-6 shadow-lg">
         <motion.div
           className="pointer-events-none absolute inset-0 flex items-center justify-start pl-8"
           style={{ opacity: skipOpacity }}
         >
           <span
-            className="text-8xl font-black text-rose-400/35 dark:text-rose-500/30"
+            className="text-8xl font-black text-zinc-400/30"
             aria-hidden
           >
             ✕
@@ -74,7 +74,7 @@ export function SwipeableMatchCard({
           style={{ opacity: likeOpacity }}
         >
           <span
-            className="text-7xl text-rose-400/40 dark:text-rose-400/35"
+            className="text-7xl text-[var(--accent)]/40"
             aria-hidden
           >
             ♥
@@ -82,13 +82,16 @@ export function SwipeableMatchCard({
         </motion.div>
 
         <div className="relative flex flex-col gap-4">
-          <div className="text-3xl font-extrabold tracking-tight">
-            {m.name} <span className="text-zinc-500">· {m.age}</span>
+          <div
+            className="text-3xl font-extrabold tracking-tight"
+            style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+          >
+            {m.name} <span className="text-[var(--foreground-muted)]">· {m.age}</span>
           </div>
-          <div className="text-lg text-zinc-600 dark:text-zinc-300">
+          <div className="text-base text-[var(--foreground-muted)]">
             {m.city} · ~{m.distanceKm} km away
           </div>
-          <p className="mt-2 text-xl leading-relaxed text-zinc-700 dark:text-zinc-200">
+          <p className="mt-2 text-base leading-relaxed text-[var(--foreground)]">
             {m.about}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -98,7 +101,7 @@ export function SwipeableMatchCard({
           </div>
         </div>
 
-        <div className="relative mt-4 flex justify-between gap-2 border-t border-zinc-100 pt-4 dark:border-zinc-800">
+        <div className="relative mt-4 flex justify-between gap-2 border-t border-[var(--border)] pt-4">
           <PrimaryButton
             variant="secondary"
             type="button"

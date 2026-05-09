@@ -1,39 +1,113 @@
+/* Google Fonts MUST be first — before @import "tailwindcss" */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@400;500;600&display=swap');
+
 @import "tailwindcss";
+
+/* ============================================================
+   Pinwheel Theme — Warm Modernism
+   White bg · dark headings · orange/coral accent
+   Plus Jakarta Sans headings · Inter body
+   ============================================================ */
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-  --accent: #e11d48;
-  --accent-hover: #be123c;
-  --accent-ring: rgba(225, 29, 72, 0.25);
+  --foreground: #0f0f0f;
+  --foreground-muted: #6b7280;
+  --foreground-subtle: #9ca3af;
+
+  /* Pinwheel orange primary */
+  --accent: #f97316;
+  --accent-hover: #ea6c0a;
+  --accent-ring: rgba(249, 115, 22, 0.25);
+
+  /* Secondary coral for gradients */
+  --accent-secondary: #f43f5e;
+
+  /* Surfaces */
+  --surface: #ffffff;
+  --surface-hover: #fafafa;
+  --border: #e5e7eb;
+  --border-subtle: #f3f4f6;
+
+  /* Nav */
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --nav-border: #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f0f0f;
+    --foreground: #f9fafb;
+    --foreground-muted: #9ca3af;
+    --foreground-subtle: #6b7280;
+
+    --accent: #fb923c;
+    --accent-hover: #f97316;
+    --accent-ring: rgba(251, 146, 60, 0.3);
+    --accent-secondary: #fb7185;
+
+    --surface: #1a1a1a;
+    --surface-hover: #222222;
+    --border: #2a2a2a;
+    --border-subtle: #1f1f1f;
+
+    --nav-bg: rgba(15, 15, 15, 0.92);
+    --nav-border: #2a2a2a;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: 'Inter', var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --accent: #fb7185;
-    --accent-hover: #f43f5e;
-    --accent-ring: rgba(251, 113, 133, 0.25);
-  }
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* Headings use Plus Jakarta Sans */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 :focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Subtle scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Pinwheel diagonal grid watermark utility */
+.pinwheel-grid-bg {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 28px,
+    rgba(0,0,0,0.025) 28px,
+    rgba(0,0,0,0.025) 29px
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {

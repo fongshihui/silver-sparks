@@ -16,10 +16,13 @@ export default function DonePage() {
   return (
     <AppShell title="You’re all set" subtitle="Your profile is ready.">
       <Card className="text-center">
-        <div className="text-3xl font-extrabold tracking-tight">
+        <div
+          className="text-3xl font-extrabold tracking-tight text-[var(--foreground)]"
+          style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+        >
           Welcome{name ? `, ${name}` : ""}.
         </div>
-        <p className="mt-3 text-lg text-zinc-700 dark:text-zinc-200">
+        <p className="mt-3 text-base text-[var(--foreground-muted)] leading-relaxed">
           You can now browse matches and start chatting.
         </p>
 

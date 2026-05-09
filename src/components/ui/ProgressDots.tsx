@@ -14,8 +14,7 @@ export function ProgressDots({
             key={i}
             className={[
               "h-2.5 rounded-full transition-all",
-              active ? "w-7 bg-[var(--accent)]" : "w-2.5 bg-zinc-300",
-              "dark:" + (active ? "bg-[var(--accent)]" : "bg-zinc-700"),
+              active ? "w-7 bg-[var(--accent)]" : "w-2.5 bg-zinc-200 dark:bg-zinc-700",
             ].join(" ")}
             aria-hidden="true"
           />

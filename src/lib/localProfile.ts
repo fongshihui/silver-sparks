@@ -1,3 +1,5 @@
+import { getCurrentEmail } from "./auth";
+
 export type VoiceAnswers = Record<string, string>;
 
 export type UserProfile = {
@@ -21,12 +23,23 @@ export type UserProfile = {
   completedAtIso?: string;
 };
 
-const STORAGE_KEY = "silverSparks.userProfile.v1";
+const PROFILE_PREFIX = "silverSparks.profile.";
+
+function profileKeyFor(email: string | null): string | null {
+  if (!email) return null;
+  return PROFILE_PREFIX + email;
+}
+
+function currentProfileKey(): string | null {
+  return profileKeyFor(getCurrentEmail());
+}
 
 export function loadProfile(): UserProfile | null {
   if (typeof window === "undefined") return null;
+  const key = currentProfileKey();
+  if (!key) return null;
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(key);
     if (!raw) return null;
     return JSON.parse(raw) as UserProfile;
   } catch {
@@ -36,12 +49,16 @@ export function loadProfile(): UserProfile | null {
 
 export function saveProfile(profile: UserProfile) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+  const key = currentProfileKey();
+  if (!key) return;
+  window.localStorage.setItem(key, JSON.stringify(profile));
 }
 
 export function clearProfile() {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem(STORAGE_KEY);
+  const key = currentProfileKey();
+  if (!key) return;
+  window.localStorage.removeItem(key);
 }
 
 export function isOnboarded(profile: UserProfile | null): boolean {
@@ -61,4 +78,3 @@ export function mergeProfile(patch: UserProfile) {
   saveProfile(merged);
   return merged;
 }
-

@@ -158,13 +158,13 @@ function ChatRoom({ chatId }: { chatId: string }) {
                   className={[
                     "rounded-3xl p-4 ring-1",
                     mine
-                      ? "bg-rose-50 ring-rose-200 dark:bg-rose-950/20 dark:ring-rose-900/40"
-                      : "bg-zinc-50 ring-zinc-200 dark:bg-zinc-950 dark:ring-zinc-800",
+                      ? "bg-orange-50 border border-orange-100 dark:bg-orange-950/20 dark:border-orange-900/30"
+                      : "bg-[var(--surface)] border border-[var(--border)]",
                   ].join(" ")}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <div className="text-base font-semibold text-zinc-500 dark:text-zinc-400">
+                      <div className="text-sm font-semibold text-[var(--foreground-muted)]">
                         {mine ? "You" : match?.name ?? "Them"} · {formatTime(m.createdAtIso)}
                       </div>
                       <div className="mt-1 text-xl font-extrabold leading-snug">{m.text}</div>
@@ -210,12 +210,12 @@ function ChatRoom({ chatId }: { chatId: string }) {
             ].join(" ")}
           >
             <div className="sm:col-span-3">
-              <label className="block text-lg font-semibold" htmlFor="draft">
+              <label className="block text-base font-semibold text-[var(--foreground)]" htmlFor="draft">
                 Your reply
               </label>
               <textarea
                 id="draft"
-                className="mt-2 w-full resize-y rounded-2xl bg-zinc-50 p-4 text-lg ring-1 ring-zinc-200 focus:outline-none focus:ring-4 focus:ring-[var(--accent-ring)] disabled:cursor-not-allowed dark:bg-zinc-950 dark:ring-zinc-800"
+                className="mt-2 w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 text-base text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-ring)] focus:border-[var(--accent)] transition-colors disabled:cursor-not-allowed"
                 rows={2}
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
@@ -270,7 +270,7 @@ export default function ChatPage() {
     return (
       <AppShell title="Chat" subtitle="Pick a conversation from Chats.">
         <Card>
-          <p className="text-lg text-zinc-700 dark:text-zinc-200">No chat selected.</p>
+          <p className="text-base text-[var(--foreground-muted)]">No chat selected.</p>
         </Card>
       </AppShell>
     );

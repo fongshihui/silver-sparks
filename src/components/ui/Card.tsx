@@ -10,8 +10,8 @@ export function Card({
   return (
     <section
       className={[
-        "rounded-3xl bg-white p-5 ring-1 ring-zinc-200 shadow-sm",
-        "dark:bg-zinc-900 dark:ring-zinc-800",
+        "rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6",
+        "shadow-sm hover:shadow-md transition-shadow duration-200",
         className,
       ].join(" ")}
     >

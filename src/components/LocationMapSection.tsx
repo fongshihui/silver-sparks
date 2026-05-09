@@ -171,14 +171,14 @@ export function LocationMapSection({ apiKey, lat, lng, onLocationChange }: Props
 
   if (!apiKey) {
     return (
-      <p className="text-base text-zinc-600 dark:text-zinc-300">
+      <p className="text-sm text-[var(--foreground-muted)]">
         To drop a pin on a map, add{" "}
-        <code className="rounded bg-zinc-200 px-1 dark:bg-zinc-800">
+        <code className="rounded bg-[var(--border-subtle)] border border-[var(--border)] px-1 text-[var(--foreground)] text-xs">
           NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
         </code>{" "}
         in{" "}
-        <code className="rounded bg-zinc-200 px-1 dark:bg-zinc-800">.env.local</code>{" "}
-        and restart <code className="rounded bg-zinc-200 px-1 dark:bg-zinc-800">npm run dev</code>.
+        <code className="rounded bg-[var(--border-subtle)] border border-[var(--border)] px-1 text-[var(--foreground)] text-xs">.env.local</code>{" "}
+        and restart <code className="rounded bg-[var(--border-subtle)] border border-[var(--border)] px-1 text-[var(--foreground)] text-xs">npm run dev</code>.
         Your city is still saved.
       </p>
     );
@@ -194,10 +194,10 @@ export function LocationMapSection({ apiKey, lat, lng, onLocationChange }: Props
       ) : null}
       <div
         ref={mapDivRef}
-        className="h-56 min-h-[14rem] w-full rounded-2xl bg-zinc-100 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800"
+        className="h-56 min-h-[14rem] w-full rounded-xl border border-[var(--border)] bg-[var(--border-subtle)]"
         style={{ minHeight: "14rem" }}
       />
-      <p className="text-sm font-semibold text-zinc-600 dark:text-zinc-400">
+      <p className="text-xs font-semibold text-[var(--foreground-muted)]">
         Tap the map or drag the pin to your usual area. We use this for distances only,
         not your street address.
       </p>
