@@ -8,6 +8,7 @@ import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { ProgressDots } from "@/components/ui/ProgressDots";
 import { DEFAULT_MAP_CENTER, geocodeCityToLatLng } from "@/lib/geo";
 import { loadProfile, mergeProfile } from "@/lib/localProfile";
+import { extractName } from "@/lib/voiceExtract";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 
@@ -26,9 +27,12 @@ export default function ProfileStepPage() {
   const initial = useMemo(() => loadProfile() ?? {}, []);
   const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-  const [name, setName] = useState(
-    () => initial.name ?? initial.voiceAnswers?.nickname ?? "",
-  );
+  const [name, setName] = useState(() => {
+    if (initial.name) return initial.name;
+    const fromVoice = initial.voiceAnswers?.nickname;
+    if (!fromVoice) return "";
+    return extractName(fromVoice) || fromVoice;
+  });
   const [age, setAge] = useState<string>(() =>
     typeof initial.age === "number" ? String(initial.age) : "",
   );

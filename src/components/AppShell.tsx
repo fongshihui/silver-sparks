@@ -18,10 +18,20 @@ function PinwheelMark() {
   );
 }
 
-function NavLink({ href, label }: { href: string; label: string }) {
+function NavLink({
+  href,
+  label,
+  isActive,
+}: {
+  href: string;
+  label: string;
+  /** When set, overrides default active detection (e.g. `/chat/[id]` belongs under Chats). */
+  isActive?: (pathname: string) => boolean;
+}) {
   const pathname = usePathname();
-  const active =
-    pathname === href || (href !== "/" && pathname.startsWith(href));
+  const active = isActive
+    ? isActive(pathname)
+    : pathname === href || (href !== "/" && pathname.startsWith(href));
   return (
     <Link
       href={href}
@@ -91,10 +101,13 @@ export function AppShell({
             {/* Desktop nav links */}
             {onboarded && (
               <nav className="hidden sm:flex items-center gap-1" aria-label="Primary">
-                <NavLink href="/" label="Matches" />
+                <NavLink href="/" label="Match" />
+                <NavLink
+                  href="/chats"
+                  label="Chats"
+                  isActive={(p) => p === "/chats" || p.startsWith("/chat/")}
+                />
                 <NavLink href="/profile" label="My Profile" />
-                <NavLink href="/voice" label="Voice" />
-                <NavLink href="/stt" label="STT" />
               </nav>
             )}
 
@@ -129,9 +142,12 @@ export function AppShell({
               {onboarded ? (
                 <div className="flex items-center gap-1 overflow-x-auto">
                   <NavLink href="/" label="Matches" />
+                  <NavLink
+                    href="/chats"
+                    label="Chats"
+                    isActive={(p) => p === "/chats" || p.startsWith("/chat/")}
+                  />
                   <NavLink href="/profile" label="Profile" />
-                  <NavLink href="/voice" label="Voice" />
-                  <NavLink href="/stt" label="STT" />
                 </div>
               ) : (
                 <span className="text-sm font-semibold text-[var(--foreground-muted)]">

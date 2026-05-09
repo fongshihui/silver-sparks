@@ -27,9 +27,14 @@ export default function Home() {
     }
   }, [authed, onboarded, profile?.language, router]);
 
-  const [deck, setDeck] = useState<RankedMatch[]>(() =>
-    rankMatches(sampleMatches, loadProfile()),
-  );
+  const [deck, setDeck] = useState<RankedMatch[]>(() => {
+    const p = loadProfile();
+    const decided = new Set<string>([
+      ...(p?.likedMatchIds ?? []),
+      ...(p?.passedMatchIds ?? []),
+    ]);
+    return rankMatches(sampleMatches, p).filter((m) => !decided.has(m.id));
+  });
 
   const reminder = useMemo(
     () =>
@@ -38,6 +43,9 @@ export default function Home() {
   );
 
   const handleSwipeLeft = (id: string) => {
+    const p = loadProfile() ?? {};
+    const prev = p.passedMatchIds ?? [];
+    mergeProfile({ passedMatchIds: [...new Set([...prev, id])] });
     setTimeout(() => setDeck((m) => m.filter((x) => x.id !== id)), 200);
   };
 
@@ -50,10 +58,10 @@ export default function Home() {
 
   return (
     <AppShell
-      title={onboarded ? "Matches" : "Silver Sparks"}
+      title={onboarded ? "Match" : "Silver Sparks"}
       subtitle={
         onboarded
-          ? "Swipe right on people you’d like to talk to. Closest matches first."
+          ? "Swipe right on people you’d like to talk to. Most recommended matches first."
           : "Friendship and romance for your golden years"
       }
     >
@@ -96,14 +104,6 @@ export default function Home() {
                 Safety reminder
               </div>
               <p className="mt-2 text-sm text-[var(--foreground-muted)] leading-relaxed">{reminder}</p>
-              <PrimaryButton
-                type="button"
-                variant="secondary"
-                className="mt-4"
-                onClick={() => play(reminder)}
-              >
-                Read aloud
-              </PrimaryButton>
             </Card>
 
             {deck.length > 0 ? (

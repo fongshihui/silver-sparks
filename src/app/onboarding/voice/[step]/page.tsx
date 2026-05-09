@@ -7,15 +7,33 @@ import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { ProgressDots } from "@/components/ui/ProgressDots";
 import { mergeProfile, loadProfile } from "@/lib/localProfile";
 import { loadVoicePrefs } from "@/lib/voicePrefs";
+import {
+  extractFromAnswer,
+  hasStructuredExtractor,
+} from "@/lib/voiceExtract";
 import { useSilenceStopRecorder } from "@/hooks/useSilenceStopRecorder";
 import { useTtsPlayer } from "@/hooks/useTtsPlayer";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 
-const prompts = [
-  { id: "nickname", text: "What is a name or nickname you’d like your new friends to call you?" },
-  { id: "sunday", text: "How would you describe your perfect Sunday afternoon?" },
+type PromptDef = {
+  id: string;
+  text: string;
+  /** Profile field this prompt populates, used for friendly preview labels. */
+  fieldLabel?: string;
+};
+
+const prompts: PromptDef[] = [
+  {
+    id: "nickname",
+    text: "What is a name or nickname you’d like your new friends to call you?",
+    fieldLabel: "your name",
+  },
+  {
+    id: "sunday",
+    text: "How would you describe your perfect Sunday afternoon?",
+  },
 ];
 
 function clampStep(raw: string) {
@@ -29,7 +47,7 @@ function segmentToString(v: string | string[] | undefined) {
   return Array.isArray(v) ? (v[0] ?? "") : v;
 }
 
-type Prompt = (typeof prompts)[number];
+type Prompt = PromptDef;
 
 function VoiceStepPanel({
   step,
@@ -167,9 +185,24 @@ function VoiceStepPanel({
     cancelAutoAdvance();
     const text = draftRef.current.trim();
     if (!text) return;
-    mergeProfile({ voiceAnswers: { [prompt.id]: text } });
+    const extracted = extractFromAnswer(prompt.id, text);
+    const valueToSave = extracted || text;
+    mergeProfile({
+      voiceAnswers: {
+        [prompt.id]: valueToSave,
+        [`${prompt.id}_raw`]: text,
+      },
+    });
     router.push(nextHref);
   }
+
+  const structured = hasStructuredExtractor(prompt.id);
+  const extractedPreview = structured ? extractFromAnswer(prompt.id, draft) : "";
+  const showExtractionPreview =
+    structured &&
+    draft.trim().length > 0 &&
+    extractedPreview.length > 0 &&
+    extractedPreview.toLowerCase() !== draft.trim().toLowerCase();
 
   return (
     <AppShell
@@ -233,6 +266,25 @@ function VoiceStepPanel({
             }}
             placeholder="Your words will appear here after you finish speaking."
           />
+          {showExtractionPreview ? (
+            <div
+              className="mt-3 rounded-xl border border-[var(--accent)] bg-orange-50 px-4 py-3 text-base text-[var(--foreground)] dark:bg-orange-950/20"
+              aria-live="polite"
+            >
+              <span className="text-[var(--foreground-muted)]">
+                We&apos;ll save {prompt.fieldLabel ?? "this"} as:
+              </span>{" "}
+              <span
+                className="font-extrabold text-[var(--accent)]"
+                style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+              >
+                {extractedPreview}
+              </span>
+              <div className="mt-1 text-sm text-[var(--foreground-muted)]">
+                Edit the transcript above if that&apos;s not quite right.
+              </div>
+            </div>
+          ) : null}
           {autoAdvanceIn !== null ? (
             <div className="mt-2 text-sm font-semibold text-[var(--foreground-muted)]">
               Next question in <span className="font-mono">{autoAdvanceIn}</span>…

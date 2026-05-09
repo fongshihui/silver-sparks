@@ -20,6 +20,8 @@ export type UserProfile = {
   genderPrefs?: string[];
   /** Match ids the member chose to connect with (swipe right). */
   likedMatchIds?: string[];
+  /** Match ids the member chose to skip (swipe left). They don't reappear. */
+  passedMatchIds?: string[];
   completedAtIso?: string;
 };
 
@@ -74,6 +76,7 @@ export function mergeProfile(patch: UserProfile) {
     interests: patch.interests ?? current.interests,
     voiceAnswers: { ...(current.voiceAnswers ?? {}), ...(patch.voiceAnswers ?? {}) },
     likedMatchIds: patch.likedMatchIds ?? current.likedMatchIds,
+    passedMatchIds: patch.passedMatchIds ?? current.passedMatchIds,
   };
   saveProfile(merged);
   return merged;

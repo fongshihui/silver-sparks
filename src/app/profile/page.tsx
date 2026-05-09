@@ -115,7 +115,7 @@ export default function ProfilePage() {
                   setProfile(loadProfile());
                 }}
               >
-                Clear local profile
+                Delete profile
               </PrimaryButton>
             </div>
           </div>

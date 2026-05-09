@@ -39,7 +39,7 @@ export default function ChatsPage() {
             <p className="text-base text-[var(--foreground-muted)]">
               No conversations yet. On{" "}
               <Link href="/" className="font-semibold text-[var(--accent)] underline underline-offset-4">
-                Matches
+                Match
               </Link>
               , swipe right on someone you’d like to talk to.
             </p>
