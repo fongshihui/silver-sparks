@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const MAP_SCRIPT_ID = "silver-sparks-google-maps";
+const MAP_SCRIPT_ID = "JomPaktor-google-maps";
 
 function loadMaps(apiKey: string): Promise<void> {
   if (typeof window === "undefined") return Promise.resolve();

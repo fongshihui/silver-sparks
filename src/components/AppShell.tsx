@@ -94,7 +94,7 @@ export function AppShell({
                 className="text-[17px] font-extrabold tracking-tight text-[var(--foreground)]"
                 style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
               >
-                Silver Sparks
+                JomPaktor
               </span>
             </Link>
 
@@ -201,7 +201,7 @@ export function AppShell({
               className="text-sm font-bold text-[var(--foreground)]"
               style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
             >
-              Silver Sparks
+              JomPaktor
             </span>
           </div>
         </div>

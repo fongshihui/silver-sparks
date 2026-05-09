@@ -25,7 +25,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Silver Sparks",
+  title: "JomPaktor",
   description:
     "Senior-friendly dating demo: voice onboarding, avatars, map-based matching, and chat safety.",
 };

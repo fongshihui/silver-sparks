@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing voice answers" }, { status: 400 });
     }
 
-    const promptStr = `You are a helpful assistant for a dating app designed for elderly users (Silver Sparks). 
+    const promptStr = `You are a helpful assistant for a dating app designed for elderly users (JomPaktor). 
 Based on these voice answers provided by the user, please write a short, friendly, and cute biography strictly in one short paragraph (3-4 sentences).
 
 User Answers:

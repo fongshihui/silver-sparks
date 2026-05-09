@@ -58,7 +58,7 @@ export default function Home() {
 
   return (
     <AppShell
-      title={onboarded ? "Match" : "Silver Sparks"}
+      title={onboarded ? "Match" : "JomPaktor"}
       subtitle={
         onboarded
           ? "Swipe right on people you’d like to talk to. Most recommended matches first."
@@ -73,7 +73,7 @@ export default function Home() {
                 className="text-3xl font-extrabold tracking-tight text-[var(--foreground)]"
                 style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
               >
-                Welcome to Silver Sparks
+                Welcome to JomPaktor
               </h2>
               <p className="text-base text-[var(--foreground-muted)] leading-relaxed">
                 Friendship and romance for your golden years. Choose your language and we'll walk you through a

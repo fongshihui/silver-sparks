@@ -34,7 +34,7 @@ export default function LanguagePage() {
             className="mt-6 text-center text-3xl font-extrabold tracking-tight text-[var(--foreground)]"
             style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
           >
-            Silver Sparks
+            JomPaktor
           </h2>
           <p className="mt-4 text-center text-base text-[var(--foreground-muted)] leading-relaxed">
             A calm, step-by-step sign-up for adults 55+. You can use your voice for most

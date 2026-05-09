@@ -140,7 +140,7 @@ export default function LogInPage() {
             </PrimaryButton>
 
             <p className="text-center text-base text-[var(--foreground-muted)]">
-              New to Silver Sparks?{" "}
+              New to JomPaktor?{" "}
               <Link
                 href="/signup"
                 className="font-semibold text-[var(--accent)] underline underline-offset-4"
