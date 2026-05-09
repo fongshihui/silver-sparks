@@ -7,6 +7,7 @@ type TtsRequestBody = {
   voiceId?: string;
   modelId?: string;
   outputFormat?: string;
+  language?: string;
 };
 
 const DEFAULT_VOICE_ID = "EXAVITQu4vr4xnSDxMaL";
@@ -53,6 +54,19 @@ export async function POST(req: Request) {
   );
   ttsUrl.searchParams.set("output_format", outputFormat);
 
+  const upstreamBody: {
+    text: string;
+    model_id: string;
+    language_code?: string;
+  } = {
+    text,
+    model_id: modelId,
+  };
+
+  if (body.language && body.language !== "en") {
+    upstreamBody.language_code = body.language;
+  }
+
   const upstream = await fetch(
     ttsUrl.toString(),
     {
@@ -60,17 +74,9 @@ export async function POST(req: Request) {
       headers: {
         "xi-api-key": apiKey,
         "content-type": "application/json",
-        accept: "audio/mpeg",
       },
-      body: JSON.stringify({
-        text,
-        model_id: modelId,
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-        },
-      }),
-    },
+      body: JSON.stringify(upstreamBody),
+    }
   );
 
   if (!upstream.ok) {

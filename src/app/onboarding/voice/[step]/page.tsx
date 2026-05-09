@@ -5,17 +5,17 @@ import { BottomBarCTA } from "@/components/ui/BottomBarCTA";
 import { Card } from "@/components/ui/Card";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { ProgressDots } from "@/components/ui/ProgressDots";
-import { mergeProfile } from "@/lib/localProfile";
+import { mergeProfile, loadProfile } from "@/lib/localProfile";
 import { loadVoicePrefs } from "@/lib/voicePrefs";
 import { useSilenceStopRecorder } from "@/hooks/useSilenceStopRecorder";
 import { useTtsPlayer } from "@/hooks/useTtsPlayer";
 import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 
 const prompts = [
-  { id: "q1", text: "What are you hoping to find on Silver Sparks?" },
-  { id: "q2", text: "What do you enjoy doing on a relaxed weekend?" },
-  { id: "q3", text: "What’s one small thing that makes you feel cared for?" },
+  { id: "nickname", text: "What is a name or nickname you’d like your new friends to call you?" },
+  { id: "sunday", text: "How would you describe your perfect Sunday afternoon?" },
 ];
 
 function clampStep(raw: string) {
@@ -24,18 +24,27 @@ function clampStep(raw: string) {
   return Math.max(1, Math.min(prompts.length, Math.floor(n)));
 }
 
-export default function VoiceStepWizardPage({
-  params,
-}: {
-  params: { step: string };
-}) {
-  const step = clampStep(params.step);
-  const idx = step - 1;
-  const prompt = prompts[idx];
-  const nextHref = step < prompts.length ? `/onboarding/voice/${step + 1}` : "/onboarding/done";
+function segmentToString(v: string | string[] | undefined) {
+  if (v == null) return "";
+  return Array.isArray(v) ? (v[0] ?? "") : v;
+}
 
+type Prompt = (typeof prompts)[number];
+
+function VoiceStepPanel({
+  step,
+  prompt,
+  nextHref,
+}: {
+  step: number;
+  prompt: Prompt;
+  nextHref: string;
+}) {
+  const router = useRouter();
   const voicePrefs = useMemo(() => loadVoicePrefs(), []);
-  const { play } = useTtsPlayer();
+  const profile = useMemo(() => loadProfile(), []);
+  const language = profile?.language || "en";
+  const { play } = useTtsPlayer(language);
   const { attach, cleanup } = useSilenceStopRecorder();
 
   const [mode, setMode] = useState<
@@ -43,6 +52,8 @@ export default function VoiceStepWizardPage({
   >("ready");
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
+  const draftRef = useRef("");
+  draftRef.current = draft;
   const [autoAdvanceIn, setAutoAdvanceIn] = useState<number | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -113,6 +124,9 @@ export default function VoiceStepWizardPage({
       const fd = new FormData();
       fd.append("model_id", "scribe_v2");
       fd.append("file", blob, "answer.webm");
+      if (language !== "en") {
+        fd.append("language_code", language);
+      }
       const res = await fetch("/api/elevenlabs/stt", { method: "POST", body: fd });
       if (!res.ok) {
         const t = await res.text().catch(() => "");
@@ -151,11 +165,10 @@ export default function VoiceStepWizardPage({
 
   function acceptAndContinue() {
     cancelAutoAdvance();
-    const text = draft.trim();
+    const text = draftRef.current.trim();
     if (!text) return;
     mergeProfile({ voiceAnswers: { [prompt.id]: text } });
-    // Navigation via Link click (simple, avoids router import).
-    window.location.href = nextHref;
+    router.push(nextHref);
   }
 
   return (
@@ -165,7 +178,7 @@ export default function VoiceStepWizardPage({
     >
       <div className="grid gap-4">
         <Card>
-          <ProgressDots total={3} activeIndex={2} />
+          <ProgressDots total={4} activeIndex={1} />
           <div className="mt-4 text-base font-semibold text-zinc-500 dark:text-zinc-400">
             Question {step} of {prompts.length}
           </div>
@@ -227,24 +240,22 @@ export default function VoiceStepWizardPage({
         <BottomBarCTA>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Link
-              href={step === 1 ? "/onboarding/profile" : `/onboarding/voice/${step - 1}`}
+              href={
+                step === 1 ? "/onboarding/language" : `/onboarding/voice/${step - 1}`
+              }
               className="text-lg font-semibold text-zinc-600 underline-offset-4 hover:underline dark:text-zinc-300"
             >
               Back
             </Link>
             <div className="flex flex-wrap gap-3">
-              <Link href={nextHref}>
-                <PrimaryButton
-                  variant="secondary"
-                  onClick={() => {
-                    cancelAutoAdvance();
-                    acceptAndContinue();
-                  }}
-                  disabled={draft.trim().length === 0}
-                >
-                  Next
-                </PrimaryButton>
-              </Link>
+              <PrimaryButton
+                type="button"
+                variant="secondary"
+                onClick={acceptAndContinue}
+                disabled={draft.trim().length === 0}
+              >
+                Next
+              </PrimaryButton>
             </div>
           </div>
         </BottomBarCTA>
@@ -253,3 +264,14 @@ export default function VoiceStepWizardPage({
   );
 }
 
+export default function VoiceStepWizardPage() {
+  const { step: stepFromRoute } = useParams<{ step?: string | string[] }>();
+  const step = clampStep(segmentToString(stepFromRoute) || "1");
+  const idx = step - 1;
+  const prompt = prompts[idx];
+  const nextHref = step < prompts.length ? `/onboarding/voice/${step + 1}` : "/onboarding/selfie";
+
+  return (
+    <VoiceStepPanel key={step} step={step} prompt={prompt} nextHref={nextHref} />
+  );
+}

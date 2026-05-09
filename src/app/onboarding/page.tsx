@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
 export default function OnboardingIndex() {
-  redirect("/onboarding/selfie");
+  redirect("/onboarding/language");
 }
 

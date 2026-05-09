@@ -2,100 +2,123 @@
 
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/ui/Card";
-import { Pill } from "@/components/ui/Pill";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { useTtsPlayer } from "@/hooks/useTtsPlayer";
-import { isOnboarded, loadProfile } from "@/lib/localProfile";
+import { isOnboarded, loadProfile, mergeProfile } from "@/lib/localProfile";
+import { rankMatches, type RankedMatch } from "@/lib/matchRanking";
 import { sampleMatches } from "@/lib/sampleData";
+import { SwipeableMatchCard } from "@/components/ui/SwipeableMatchCard";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export default function Home() {
-  const [onboarded] = useState(() => isOnboarded(loadProfile()));
-  const { play } = useTtsPlayer();
+  const [profile] = useState(() => loadProfile());
+  const onboarded = isOnboarded(profile);
+  const lang = profile?.language ?? "en";
+  const { play } = useTtsPlayer(lang);
+
+  const [deck, setDeck] = useState<RankedMatch[]>(() =>
+    rankMatches(sampleMatches, loadProfile()),
+  );
+
+  const reminder = useMemo(
+    () =>
+      "If anyone asks for money, gift cards, or tries to rush you, pause. Keep all chats here and ask someone you trust.",
+    [],
+  );
+
+  const handleSwipeLeft = (id: string) => {
+    setTimeout(() => setDeck((m) => m.filter((x) => x.id !== id)), 200);
+  };
+
+  const handleSwipeRight = (m: RankedMatch) => {
+    const p = loadProfile() ?? {};
+    const prev = p.likedMatchIds ?? [];
+    mergeProfile({ likedMatchIds: [...new Set([...prev, m.id])] });
+    setTimeout(() => setDeck((prevDeck) => prevDeck.filter((x) => x.id !== m.id)), 200);
+  };
 
   return (
     <AppShell
-      title="Matches"
-      subtitle="Bigger text, fewer decisions, and safer conversations."
+      title={onboarded ? "Matches" : "Silver Sparks"}
+      subtitle={
+        onboarded
+          ? "Swipe right on people you’d like to talk to. Closest matches first."
+          : "Friendship and romance for your golden years — large text, gentle steps, and safety built in."
+      }
     >
       <div className="grid gap-4">
         {!onboarded ? (
-          <Card className="bg-gradient-to-br from-white to-rose-50/60 dark:from-zinc-900 dark:to-rose-950/20">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
-                <div className="text-lg font-semibold">
-                  Complete your profile
-                </div>
-                <p className="mt-1 text-lg text-zinc-700 dark:text-zinc-200">
-                  Add a photo, basics, and a couple voice answers so matches
-                  feel more real.
-                </p>
-              </div>
-              <Link href="/onboarding">
-                <PrimaryButton size="xl">Start setup</PrimaryButton>
+          <Card className="flex flex-col items-center justify-center gap-8 py-14 text-center">
+            <div className="flex max-w-lg flex-col gap-3">
+              <h2 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
+                Welcome
+              </h2>
+              <p className="text-lg text-zinc-600 dark:text-zinc-300">
+                First, choose the language you want for voice prompts and read-aloud.
+                We’ll walk you through a few short questions, a photo for a cute avatar,
+                and your profile before you see anyone.
+              </p>
+            </div>
+            <div className="flex w-full max-w-sm flex-col gap-4">
+              <Link href="/onboarding/language" className="w-full">
+                <PrimaryButton size="xl" className="w-full">
+                  Choose language & sign up
+                </PrimaryButton>
               </Link>
+              <button
+                type="button"
+                onClick={() =>
+                  alert("Log in is not wired in this demo — use Sign up on this device.")
+                }
+                className="w-full rounded-2xl bg-zinc-100 py-4 text-lg font-semibold text-zinc-800 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+              >
+                Log in (demo)
+              </button>
             </div>
           </Card>
-        ) : null}
+        ) : (
+          <>
+            <Card>
+              <div className="text-lg font-semibold">Safety reminder</div>
+              <p className="mt-2 text-lg text-zinc-700 dark:text-zinc-200">{reminder}</p>
+              <PrimaryButton
+                type="button"
+                variant="secondary"
+                className="mt-4"
+                onClick={() => play(reminder)}
+              >
+                Read aloud
+              </PrimaryButton>
+            </Card>
 
-        <Card>
-          <div className="text-lg font-semibold">Today’s gentle reminder</div>
-          <p className="mt-2 text-lg text-zinc-700 dark:text-zinc-200">
-            If anyone asks for money, gift cards, crypto, or tries to rush you,
-            pause. You can keep chatting here and ask a friend for advice.
-          </p>
-        </Card>
-
-        <ul className="grid gap-4 sm:grid-cols-2" aria-label="Match list">
-          {sampleMatches.map((m) => (
-            <li key={m.id}>
-              <Card className="h-full">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="text-2xl font-extrabold tracking-tight">
-                      {m.name} <span className="text-zinc-500">· {m.age}</span>
-                    </div>
-                    <div className="mt-1 text-lg text-zinc-600 dark:text-zinc-300">
-                      {m.city} · ~{m.distanceKm} km away
-                    </div>
-                  </div>
-                  <div className="shrink-0 flex flex-col gap-2">
-                    <PrimaryButton
-                      variant="secondary"
-                      onClick={() => play(`${m.name}. ${m.about}`)}
-                    >
-                      Read aloud
-                    </PrimaryButton>
-                    <Link href={`/chat/${m.id}`}>
-                      <PrimaryButton>Chat</PrimaryButton>
-                    </Link>
-                  </div>
-                </div>
-                <p className="mt-3 text-lg text-zinc-700 dark:text-zinc-200">
-                  {m.about}
+            {deck.length > 0 ? (
+              <div className="relative mt-4 flex h-[520px] w-full justify-center">
+                {deck.map((m, index) => (
+                  <SwipeableMatchCard
+                    key={m.id}
+                    m={m}
+                    zIndex={deck.length - index}
+                    onSwipeLeft={() => handleSwipeLeft(m.id)}
+                    onSwipeRight={() => handleSwipeRight(m)}
+                    playText={play}
+                  />
+                ))}
+              </div>
+            ) : (
+              <Card className="py-10 text-center">
+                <h2 className="mb-2 text-2xl font-bold">No more people in your radius</h2>
+                <p className="text-lg text-zinc-600 dark:text-zinc-300">
+                  Try widening age or distance in{" "}
+                  <Link href="/profile" className="font-semibold underline underline-offset-4">
+                    My profile
+                  </Link>
+                  , or check back later.
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {m.interests.map((tag) => (
-                    <Pill key={tag}>{tag}</Pill>
-                  ))}
-                </div>
               </Card>
-            </li>
-          ))}
-        </ul>
-
-        <Card>
-          <div className="text-lg font-semibold">Sponsor hooks (optional)</div>
-          <ul className="mt-2 list-disc pl-6 text-lg text-zinc-700 dark:text-zinc-200">
-            <li>
-              OpenAI: scam-risk explanation + suggested reply (when API key is
-              set).
-            </li>
-            <li>ElevenLabs: voice read-aloud for messages (when key is set).</li>
-            <li>Convex: store chats/profiles if you enable it later.</li>
-          </ul>
-        </Card>
+            )}
+          </>
+        )}
       </div>
     </AppShell>
   );

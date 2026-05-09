@@ -1,11 +1,16 @@
+export type MatchGender = "Men" | "Women" | "Other";
+
 export type Match = {
   id: string;
   name: string;
   age: number;
   city: string;
-  distanceKm: number;
+  /** Rough member location for distance sorting (demo). */
+  lat: number;
+  lng: number;
   interests: string[];
   about: string;
+  gender: MatchGender;
 };
 
 export const sampleMatches: Match[] = [
@@ -14,8 +19,10 @@ export const sampleMatches: Match[] = [
     name: "Maya",
     age: 62,
     city: "Singapore",
-    distanceKm: 6,
+    lat: 1.3329,
+    lng: 103.8006,
     interests: ["Gardening", "Hawker food", "Walks"],
+    gender: "Women",
     about:
       "I love slow mornings, plants, and long chats. Looking for someone kind and steady.",
   },
@@ -24,8 +31,10 @@ export const sampleMatches: Match[] = [
     name: "Daniel",
     age: 68,
     city: "Singapore",
-    distanceKm: 4,
+    lat: 1.3644,
+    lng: 103.8515,
     interests: ["Jazz", "Museums", "Cooking"],
+    gender: "Men",
     about:
       "Retired teacher. I enjoy museums and cooking new recipes. Coffee dates welcome.",
   },
@@ -34,8 +43,10 @@ export const sampleMatches: Match[] = [
     name: "Lina",
     age: 65,
     city: "Singapore",
-    distanceKm: 9,
+    lat: 1.2897,
+    lng: 103.8501,
     interests: ["Swimming", "K-dramas", "Family"],
+    gender: "Women",
     about:
       "Easy-going and family-oriented. I like quiet weekends and good humour.",
   },
@@ -62,6 +73,12 @@ export const sampleChats: Record<string, ChatMessage[]> = {
       text: "I enjoy walks and trying new hawker stalls. How about you?",
       createdAtIso: new Date(Date.now() - 1000 * 60 * 60 * 19).toISOString(),
     },
+    {
+      id: "m-scam-demo",
+      role: "them",
+      text: "Urgent — I need a wire transfer today. Message me on WhatsApp, keep it secret.",
+      createdAtIso: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString(),
+    },
   ],
   "daniel-68": [
     {
@@ -86,4 +103,3 @@ export const sampleChats: Record<string, ChatMessage[]> = {
     },
   ],
 };
-

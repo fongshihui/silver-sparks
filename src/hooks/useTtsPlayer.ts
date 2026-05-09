@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 
-export function useTtsPlayer() {
+export function useTtsPlayer(language: string = "en") {
   const audioElRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -25,7 +25,7 @@ export function useTtsPlayer() {
     const res = await fetch("/api/elevenlabs/tts", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ text: cleaned }),
+      body: JSON.stringify({ text: cleaned, language }),
     });
     if (!res.ok) throw new Error("TTS failed.");
     const blob = await res.blob();
@@ -45,7 +45,7 @@ export function useTtsPlayer() {
 
     setIsPlaying(true);
     await a.play();
-  }, []);
+  }, [language]);
 
   return { play, stop, isPlaying };
 }

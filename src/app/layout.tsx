@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Silver Sparks",
   description:
-    "An accessibility-first, safety-first dating demo with voice read-aloud.",
+    "Senior-friendly dating demo: voice onboarding, avatars, map-based matching, and chat safety.",
 };
 
 export default function RootLayout({

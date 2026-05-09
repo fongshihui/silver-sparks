@@ -7,9 +7,12 @@ import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { ProgressDots } from "@/components/ui/ProgressDots";
 import { loadProfile, mergeProfile } from "@/lib/localProfile";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export default function SelfieStepPage() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
   const [selfieDataUrl, setSelfieDataUrl] = useState<string | null>(() => {
     const p = loadProfile();
     return p?.selfieDataUrl ?? null;
@@ -19,10 +22,53 @@ export default function SelfieStepPage() {
     return p?.avatarDataUrl ?? null;
   });
   const [customization, setCustomization] = useState(
-    "Pixar-style, friendly smile, warm lighting, clean background",
+    "Friendly illustrated portrait, warm smile, soft lighting, simple background",
   );
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
+  const stopCamera = useCallback(() => {
+    const s = streamRef.current;
+    if (s) {
+      for (const t of s.getTracks()) t.stop();
+      streamRef.current = null;
+    }
+    if (videoRef.current) videoRef.current.srcObject = null;
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user", width: 1280, height: 720 },
+          audio: false,
+        });
+        if (cancelled) {
+          for (const t of stream.getTracks()) t.stop();
+          return;
+        }
+        streamRef.current = stream;
+        const v = videoRef.current;
+        if (v) {
+          v.srcObject = stream;
+          await v.play().catch(() => {});
+        }
+        setCameraError(null);
+      } catch {
+        if (!cancelled) {
+          setCameraError(
+            "We couldn’t open your camera automatically. You can still upload a photo below.",
+          );
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+      stopCamera();
+    };
+  }, [stopCamera]);
 
   const canContinue = useMemo(
     () => Boolean(avatarDataUrl || selfieDataUrl),
@@ -41,9 +87,27 @@ export default function SelfieStepPage() {
     reader.readAsDataURL(file);
   }
 
+  function captureFromCamera() {
+    const v = videoRef.current;
+    if (!v || v.videoWidth === 0) {
+      setError("Wait for the camera preview, then try again.");
+      return;
+    }
+    const canvas = document.createElement("canvas");
+    canvas.width = v.videoWidth;
+    canvas.height = v.videoHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.drawImage(v, 0, 0);
+    const url = canvas.toDataURL("image/jpeg", 0.92);
+    setSelfieDataUrl(url);
+    mergeProfile({ selfieDataUrl: url });
+    setError(null);
+  }
+
   async function generateAvatar() {
     if (!selfieDataUrl) {
-      setError("Upload a face photo first.");
+      setError("Take or upload a face photo first.");
       return;
     }
     setIsGenerating(true);
@@ -77,23 +141,45 @@ export default function SelfieStepPage() {
 
   return (
     <AppShell
-      title="Set up your profile"
-      subtitle="Step 1 of 3 — Create your avatar."
+      title="Your photo"
+      subtitle="Step 3 of 4 — We’ll turn this into a friendly avatar."
     >
       <div className="grid gap-4">
         <Card>
-          <ProgressDots total={3} activeIndex={0} />
+          <ProgressDots total={4} activeIndex={2} />
           <div className="mt-4 text-2xl font-extrabold tracking-tight">
-            Upload your face photo
+            Take a quick selfie
           </div>
           <p className="mt-2 text-lg text-zinc-700 dark:text-zinc-200">
-            We’ll use it to generate a friendly avatar. You can edit the result.
+            Your camera opens on its own on most laptops and phones. When you’re ready,
+            tap <span className="font-semibold">Use this photo</span>. You can also upload
+            a picture instead.
           </p>
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 sm:items-start">
+          <div className="mt-5 grid gap-4 lg:grid-cols-2 lg:items-start">
             <div className="rounded-3xl bg-zinc-50 p-4 ring-1 ring-zinc-200 dark:bg-zinc-950 dark:ring-zinc-800">
-              <label className="block text-lg font-semibold" htmlFor="selfie">
-                Upload a photo
+              <div className="text-lg font-semibold">Camera</div>
+              <div className="mt-3 overflow-hidden rounded-2xl bg-black ring-1 ring-zinc-800">
+                <video
+                  ref={videoRef}
+                  className="aspect-[4/3] w-full object-cover"
+                  playsInline
+                  muted
+                />
+              </div>
+              {cameraError ? (
+                <p className="mt-2 text-base font-semibold text-amber-800 dark:text-amber-200">
+                  {cameraError}
+                </p>
+              ) : null}
+              <div className="mt-4 flex flex-wrap gap-3">
+                <PrimaryButton type="button" size="lg" onClick={captureFromCamera}>
+                  Use this photo
+                </PrimaryButton>
+              </div>
+
+              <label className="mt-6 block text-lg font-semibold" htmlFor="selfie">
+                Or upload a photo
               </label>
               <input
                 id="selfie"
@@ -103,15 +189,9 @@ export default function SelfieStepPage() {
                 className="mt-3 block w-full text-lg"
                 onChange={(e) => onFile(e.target.files?.[0] ?? null)}
               />
-              <p className="mt-3 text-base font-semibold text-zinc-600 dark:text-zinc-300">
-                Tip: On mobile, this can open the front camera.
-              </p>
 
-              <div className="mt-4">
-                <label
-                  className="block text-lg font-semibold"
-                  htmlFor="custom"
-                >
+              <div className="mt-6">
+                <label className="block text-lg font-semibold" htmlFor="custom">
                   Avatar style (optional)
                 </label>
                 <textarea
@@ -130,7 +210,7 @@ export default function SelfieStepPage() {
                   disabled={!selfieDataUrl || isGenerating}
                   onClick={generateAvatar}
                 >
-                  {isGenerating ? "Generating…" : "Generate avatar"}
+                  {isGenerating ? "Generating…" : "Create cute avatar"}
                 </PrimaryButton>
               </div>
 
@@ -142,7 +222,7 @@ export default function SelfieStepPage() {
             </div>
 
             <div className="rounded-3xl bg-zinc-50 p-4 ring-1 ring-zinc-200 dark:bg-zinc-950 dark:ring-zinc-800">
-              <div className="text-lg font-semibold">Avatar preview</div>
+              <div className="text-lg font-semibold">Preview</div>
               {avatarDataUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -154,17 +234,17 @@ export default function SelfieStepPage() {
                 <div className="mt-3 grid gap-3">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    alt="Your uploaded face photo"
+                    alt="Photo you chose"
                     src={selfieDataUrl}
                     className="aspect-square w-full rounded-3xl object-cover ring-1 ring-zinc-200 dark:ring-zinc-800"
                   />
                   <div className="text-base font-semibold text-zinc-600 dark:text-zinc-300">
-                    Upload looks good — tap “Generate avatar”.
+                    When it looks good, tap “Create cute avatar”.
                   </div>
                 </div>
               ) : (
                 <div className="mt-3 grid aspect-square place-items-center rounded-3xl bg-white text-lg font-semibold text-zinc-500 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:ring-zinc-800">
-                  No avatar yet
+                  No photo yet
                 </div>
               )}
             </div>
@@ -174,10 +254,10 @@ export default function SelfieStepPage() {
         <BottomBarCTA>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Link
-              href="/"
+              href="/onboarding/voice/2"
               className="text-lg font-semibold text-zinc-600 underline-offset-4 hover:underline dark:text-zinc-300"
             >
-              Back to matches
+              Back
             </Link>
             <Link
               aria-disabled={!canContinue}
@@ -195,4 +275,3 @@ export default function SelfieStepPage() {
     </AppShell>
   );
 }
-

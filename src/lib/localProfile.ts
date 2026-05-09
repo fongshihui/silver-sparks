@@ -1,14 +1,23 @@
 export type VoiceAnswers = Record<string, string>;
 
 export type UserProfile = {
+  language?: string;
   selfieDataUrl?: string;
   avatarDataUrl?: string;
   name?: string;
   age?: number;
   city?: string;
+  /** Set via map picker or geocoding; used for match distance sorting. */
+  latitude?: number;
+  longitude?: number;
   bio?: string;
   interests?: string[];
   voiceAnswers?: VoiceAnswers;
+  matchRadius?: number;
+  ageRange?: [number, number];
+  genderPrefs?: string[];
+  /** Match ids the member chose to connect with (swipe right). */
+  likedMatchIds?: string[];
   completedAtIso?: string;
 };
 
@@ -47,6 +56,7 @@ export function mergeProfile(patch: UserProfile) {
     ...patch,
     interests: patch.interests ?? current.interests,
     voiceAnswers: { ...(current.voiceAnswers ?? {}), ...(patch.voiceAnswers ?? {}) },
+    likedMatchIds: patch.likedMatchIds ?? current.likedMatchIds,
   };
   saveProfile(merged);
   return merged;

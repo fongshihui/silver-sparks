@@ -5,11 +5,11 @@ import { BottomBarCTA } from "@/components/ui/BottomBarCTA";
 import { Card } from "@/components/ui/Card";
 import { LocationMapSection } from "@/components/LocationMapSection";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
-import { ProgressDots } from "@/components/ui/ProgressDots";
 import { DEFAULT_MAP_CENTER, geocodeCityToLatLng } from "@/lib/geo";
 import { loadProfile, mergeProfile } from "@/lib/localProfile";
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 
 const defaultInterests = [
   "Coffee",
@@ -22,19 +22,17 @@ const defaultInterests = [
   "Family",
 ];
 
-export default function ProfileStepPage() {
+export default function EditProfilePage() {
+  const router = useRouter();
   const initial = useMemo(() => loadProfile() ?? {}, []);
   const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-  const [name, setName] = useState(
-    () => initial.name ?? initial.voiceAnswers?.nickname ?? "",
-  );
+  const [name, setName] = useState(() => initial.name ?? "");
   const [age, setAge] = useState<string>(() =>
     typeof initial.age === "number" ? String(initial.age) : "",
   );
   const [city, setCity] = useState(() => initial.city ?? "");
   const [bio, setBio] = useState(() => initial.bio ?? "");
-  const [isGeneratingBio, setIsGeneratingBio] = useState(false);
   const [matchRadius, setMatchRadius] = useState(() => initial.matchRadius ?? 25);
   const [ageRange, setAgeRange] = useState<[number, number]>(
     () => initial.ageRange ?? [55, 85],
@@ -54,11 +52,31 @@ export default function ProfileStepPage() {
   const [isGeocodingCity, setIsGeocodingCity] = useState(false);
   const [cityGeoHint, setCityGeoHint] = useState<string | null>(null);
 
-  const onMapLocation = useCallback((lat: number, lng: number) => {
-    setLatitude(lat);
-    setLongitude(lng);
-    mergeProfile({ latitude: lat, longitude: lng });
-  }, []);
+  const ageNumber = useMemo(() => {
+    const n = Number(age);
+    if (!Number.isFinite(n)) return null;
+    if (n < 18 || n > 120) return null;
+    return n;
+  }, [age]);
+
+  const canSave = useMemo(() => {
+    return name.trim().length > 0 && ageNumber !== null && city.trim().length > 0;
+  }, [name, ageNumber, city]);
+
+  function saveDraft() {
+    mergeProfile({
+      name: name.trim(),
+      age: ageNumber ?? undefined,
+      city: city.trim(),
+      bio: bio.trim(),
+      interests: selected,
+      matchRadius,
+      ageRange,
+      genderPrefs,
+      latitude,
+      longitude,
+    });
+  }
 
   async function syncMapToCity() {
     const normalizedCity = city.trim();
@@ -93,21 +111,11 @@ export default function ProfileStepPage() {
     }
   }
 
-  const ageNumber = useMemo(() => {
-    const n = Number(age);
-    if (!Number.isFinite(n)) return null;
-    if (n < 18 || n > 120) return null;
-    return n;
-  }, [age]);
-
-  const canContinue = useMemo(() => {
-    return name.trim().length > 0 && ageNumber !== null && city.trim().length > 0;
-  }, [name, ageNumber, city]);
-
-  const canSuggestBio = useMemo(() => {
-    const va = initial.voiceAnswers;
-    return Boolean(va && Object.keys(va).length > 0);
-  }, [initial.voiceAnswers]);
+  function toggleGender(g: string) {
+    setGenderPrefs((prev) =>
+      prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g],
+    );
+  }
 
   function toggleInterest(tag: string) {
     setSelected((prev) =>
@@ -115,81 +123,16 @@ export default function ProfileStepPage() {
     );
   }
 
-  function saveDraft() {
-    mergeProfile({
-      name: name.trim(),
-      age: ageNumber ?? undefined,
-      city: city.trim(),
-      bio: bio.trim(),
-      interests: selected,
-      matchRadius,
-      ageRange,
-      genderPrefs,
-      latitude,
-      longitude,
-    });
-  }
-
-  async function generateBioFromVoice() {
-    if (!initial.voiceAnswers) return;
-    setIsGeneratingBio(true);
-    try {
-      const res = await fetch("/api/openai/bio", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ voiceAnswers: initial.voiceAnswers }),
-      });
-      const data = (await res.json()) as { bio?: string };
-      if (data.bio) {
-        setBio(data.bio);
-        mergeProfile({ bio: data.bio });
-      }
-    } catch {
-      /* keep UI calm for seniors */
-    } finally {
-      setIsGeneratingBio(false);
-    }
-  }
-
-  function toggleGender(g: string) {
-    setGenderPrefs((prev) =>
-      prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g],
-    );
-  }
-
   return (
-    <AppShell
-      title="Your dating profile"
-      subtitle="Step 4 of 4 — Review, adjust, then start meeting people."
-    >
+    <AppShell title="Edit profile" subtitle="Make changes anytime.">
       <div className="grid gap-4">
         <Card>
-          <ProgressDots total={4} activeIndex={3} />
-          <div className="mt-4 text-2xl font-extrabold tracking-tight">
-            Check your details
-          </div>
+          <div className="text-2xl font-extrabold tracking-tight">Your details</div>
           <p className="mt-2 text-lg text-zinc-700 dark:text-zinc-200">
-            We started this from your voice answers and avatar. Change anything you
-            like before you continue.
+            Update your profile, location, and preferences. Changes save to this device.
           </p>
 
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              {!bio && canSuggestBio ? (
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <PrimaryButton
-                    type="button"
-                    variant="secondary"
-                    disabled={isGeneratingBio}
-                    onClick={() => void generateBioFromVoice()}
-                  >
-                    {isGeneratingBio
-                      ? "Writing your about-me…"
-                      : "Write my about-me from my voice answers"}
-                  </PrimaryButton>
-                </div>
-              ) : null}
-            </div>
             <div>
               <label className="block text-lg font-semibold" htmlFor="name">
                 Name
@@ -251,15 +194,18 @@ export default function ProfileStepPage() {
             <div className="sm:col-span-2">
               <div className="text-lg font-semibold">Location on map</div>
               <p className="mt-1 text-base text-zinc-600 dark:text-zinc-300">
-                Helps sort people by distance. Drag the pin if the default spot is
-                wrong.
+                Helps sort people by distance. Drag the pin if the default spot is wrong.
               </p>
               <div className="mt-3">
                 <LocationMapSection
                   apiKey={mapsKey}
                   lat={latitude}
                   lng={longitude}
-                  onLocationChange={onMapLocation}
+                  onLocationChange={(lat, lng) => {
+                    setLatitude(lat);
+                    setLongitude(lng);
+                    mergeProfile({ latitude: lat, longitude: lng });
+                  }}
                 />
               </div>
             </div>
@@ -270,12 +216,11 @@ export default function ProfileStepPage() {
               </label>
               <textarea
                 id="bio"
-                className="mt-2 w-full resize-y rounded-2xl bg-zinc-50 p-4 text-lg ring-1 ring-zinc-200 focus:outline-none focus:ring-4 focus:ring-[var(--accent-ring)] dark:bg-zinc-950 dark:ring-zinc-800 disabled:opacity-50"
+                className="mt-2 w-full resize-y rounded-2xl bg-zinc-50 p-4 text-lg ring-1 ring-zinc-200 focus:outline-none focus:ring-4 focus:ring-[var(--accent-ring)] dark:bg-zinc-950 dark:ring-zinc-800"
                 rows={4}
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 onBlur={saveDraft}
-                disabled={isGeneratingBio}
                 placeholder="A few sentences about you."
               />
             </div>
@@ -312,9 +257,7 @@ export default function ProfileStepPage() {
                     max={120}
                     className="w-24 rounded-xl bg-zinc-50 p-3 text-center text-lg ring-1 ring-zinc-200 dark:bg-zinc-950 dark:ring-zinc-800"
                     value={ageRange[0]}
-                    onChange={(e) =>
-                      setAgeRange([Number(e.target.value), ageRange[1]])
-                    }
+                    onChange={(e) => setAgeRange([Number(e.target.value), ageRange[1]])}
                     onBlur={saveDraft}
                   />
                   <span className="text-lg">to</span>
@@ -324,16 +267,14 @@ export default function ProfileStepPage() {
                     max={120}
                     className="w-24 rounded-xl bg-zinc-50 p-3 text-center text-lg ring-1 ring-zinc-200 dark:bg-zinc-950 dark:ring-zinc-800"
                     value={ageRange[1]}
-                    onChange={(e) =>
-                      setAgeRange([ageRange[0], Number(e.target.value)])
-                    }
+                    onChange={(e) => setAgeRange([ageRange[0], Number(e.target.value)])}
                     onBlur={saveDraft}
                   />
                 </div>
               </div>
 
               <div className="sm:col-span-2">
-                <div className="text-lg font-semibold mb-2">Open to meeting</div>
+                <div className="mb-2 text-lg font-semibold">Open to meeting</div>
                 <div className="flex flex-wrap gap-2">
                   {["Men", "Women", "Other"].map((g) => {
                     const on = genderPrefs.includes(g);
@@ -341,7 +282,10 @@ export default function ProfileStepPage() {
                       <button
                         key={g}
                         type="button"
-                        onClick={() => toggleGender(g)}
+                        onClick={() => {
+                          toggleGender(g);
+                          setTimeout(saveDraft, 0);
+                        }}
                         className={[
                           "rounded-full px-4 py-2 text-base font-semibold ring-1",
                           "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--accent-ring)]",
@@ -391,28 +335,25 @@ export default function ProfileStepPage() {
         <BottomBarCTA>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Link
-              href="/onboarding/selfie"
+              href="/profile"
               className="text-lg font-semibold text-zinc-600 underline-offset-4 hover:underline dark:text-zinc-300"
             >
               Back
             </Link>
-            <Link
-              aria-disabled={!canContinue}
-              tabIndex={canContinue ? 0 : -1}
-              href={canContinue ? "/onboarding/done" : "#"}
-              className={canContinue ? "" : "pointer-events-none opacity-60"}
+            <PrimaryButton
+              size="xl"
+              disabled={!canSave}
               onClick={() => {
                 saveDraft();
-                mergeProfile({ completedAtIso: new Date().toISOString() });
+                router.push("/profile");
               }}
             >
-              <PrimaryButton size="xl" disabled={!canContinue}>
-                Confirm and finish
-              </PrimaryButton>
-            </Link>
+              Save changes
+            </PrimaryButton>
           </div>
         </BottomBarCTA>
       </div>
     </AppShell>
   );
 }
+

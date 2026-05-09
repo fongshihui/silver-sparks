@@ -3,6 +3,7 @@
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { loadVoicePrefs, saveVoicePrefs } from "@/lib/voicePrefs";
 import { useTtsPlayer } from "@/hooks/useTtsPlayer";
+import { loadProfile } from "@/lib/localProfile";
 import { useMemo, useState } from "react";
 
 export function VoiceModeToggle({
@@ -13,8 +14,9 @@ export function VoiceModeToggle({
   speakText: string;
 }) {
   const initial = useMemo(() => loadVoicePrefs(), []);
+  const lang = useMemo(() => loadProfile()?.language ?? "en", []);
   const [prefs, setPrefs] = useState(initial);
-  const { play, isPlaying } = useTtsPlayer();
+  const { play, isPlaying } = useTtsPlayer(lang);
 
   async function toggle() {
     const next = { ...prefs, enabled: !prefs.enabled };

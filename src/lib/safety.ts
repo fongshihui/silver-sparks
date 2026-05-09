@@ -3,11 +3,13 @@ export type SafetyLevel = "low" | "medium" | "high";
 export type SafetyResult = {
   level: SafetyLevel;
   reasons: string[];
+  /** Short line for moderation UI. */
+  message: string;
   suggestedReply?: string;
 };
 
-export function localHeuristicSafetyCheck(message: string): SafetyResult {
-  const text = message.toLowerCase();
+export function localHeuristicSafetyCheck(textIn: string): SafetyResult {
+  const text = textIn.toLowerCase();
   const reasons: string[] = [];
 
   const moneySignals = [
@@ -60,6 +62,11 @@ export function localHeuristicSafetyCheck(message: string): SafetyResult {
       ? undefined
       : "I prefer to keep chatting here for now. I don’t send money or share bank details. If we keep talking, maybe we can meet in a public place.";
 
-  return { level, reasons, suggestedReply };
+  const message =
+    reasons.length > 0
+      ? reasons.join(" ")
+      : "Our safety tools flagged this conversation.";
+
+  return { level, reasons, message, suggestedReply };
 }
 

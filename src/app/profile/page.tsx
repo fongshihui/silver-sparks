@@ -71,27 +71,10 @@ export default function ProfilePage() {
         </Card>
 
         <Card>
-          <div className="text-lg font-semibold">Voice answers</div>
-          {p?.voiceAnswers && Object.keys(p.voiceAnswers).length > 0 ? (
-            <div className="mt-3 grid gap-3">
-              {Object.entries(p.voiceAnswers).map(([id, text]) => (
-                <div
-                  key={id}
-                  className="rounded-2xl bg-zinc-50 p-4 text-lg text-zinc-900 ring-1 ring-zinc-200 dark:bg-zinc-950 dark:text-zinc-50 dark:ring-zinc-800"
-                >
-                  {text}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-2 text-lg text-zinc-700 dark:text-zinc-200">
-              No voice answers yet.
-            </p>
-          )}
 
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Link href="/onboarding">
-              <PrimaryButton variant="secondary">Edit via setup</PrimaryButton>
+            <Link href="/profile/edit">
+              <PrimaryButton variant="secondary">Edit profile</PrimaryButton>
             </Link>
             <PrimaryButton
               variant="danger"
